@@ -15,20 +15,17 @@ QIIME 2 is usually installed by following the official installation instructions
 
 So...let's start by pulling a local copy of the project repository down from GitHub.
 
-In [ ]:
-!git clone https://github.com/gibbons-lab/isb_course_2020 materials
+In [ ]: !git clone https://github.com/gibbons-lab/isb_course_2020 materials
 
 Now we are ready to set up our environment. This will take about 10-15 minutes.
 
 Note: This setup is only relevant for Google Colaboratory and will not work on your local machine. Please follow the official installation instructions for that.
 
-In [ ]:
-%run materials/setup_qiime2.py
+In [ ]: %run materials/setup_qiime2.py
 
 We will switch to working within the materials directory for the rest of the notebook.
 
-In [ ]:
-%cd materials
+In [ ]: %cd materials
 
 Our first QIIME 2 command
 Let's remember our workflow for today.
@@ -39,8 +36,7 @@ The first thing we have to do is to get the data into an artifact. We can import
 
 QoL Tip: QIIME 2 commands can get very long. To split them up over several lines we can use \ which means "continue on the next line".
 
-In [ ]:
-!qiime tools import \
+In [ ]: !qiime tools import \
   --type 'SampleData[SequencesWithQuality]' \
   --input-path manifest.tsv \
   --output-path cdiff.qza \
@@ -60,8 +56,7 @@ Argument types usually begin with a letter denoting their meaning:
 
 In this case we will use the summarize action from the demux plugin with the previously generated artifact as input and output the resulting visualization to the qualities.qzv file.
 
-In [ ]:
-!qiime demux summarize --i-data cdiff.qza --o-visualization qualities. qzv 
+In [ ]: !qiime demux summarize --i-data cdiff.qza --o-visualization qualities. qzv 
 
 You can view the plot by downloading the .qzv file and opening it using http://view.qiime2.org. To download the file click on the folder symbol to the left, open the materials folder, and choose download from the dot menu next to the qualities.qzv file.
 
@@ -76,16 +71,14 @@ remove chimeras
 count the abundances of each ASV
 Since this step takes a bit, let's start the process and use the time to understand what is happening:
 
-In [ ]:
-!qiime dada2 denoise-single \
+In [ ]: !qiime dada2 denoise-single \
     --i-demultiplexed-seqs cdiff.qza \
     --p-trunc-len 150 \
     --output-dir dada2 --verbose
 If this step takes too long or fails, you can also copy the results from the treasure chest. However, don't run the next cell if this cell completes successfully.
 
-In [ ]:
 # only run if the previous cell did not work
-!cp -r treasure_chest/dada2 .
+In [ ]: !cp -r treasure_chest/dada2 .
 
 Ok, this step ran, but we should also make sure it kind of worked. One good way to tell if the identified ASVs are representative of the sample is to see how many reads were maintained throughout the pipeline. Here, the most common issues and solutions are:
 
@@ -103,8 +96,7 @@ This is usualluy an experimental issue as chimeras are introduced during amplifi
 
 Our denoising stats are contained in an artifact. To convert it to a visualization we can use qiime metadata tabulate.
 
-In [ ]:
-!qiime metadata tabulate \
+In [ ]: !qiime metadata tabulate \
     --m-input-file dada2/denoising_stats.qza \
     --o-visualization dada2/denoising-stats.qzv
 
@@ -114,8 +106,7 @@ Phylogeny and diversity
 Building a tree
 We can build a phylogenetic tree for our sequences using the following command:
 
-In [ ]:
-!qiime phylogeny align-to-tree-mafft-fasttree \
+In [ ]: !qiime phylogeny align-to-tree-mafft-fasttree \
     --i-sequences dada2/representative_sequences.qza \
     --output-dir tree
 
@@ -130,8 +121,7 @@ Subsampe our samples to the same total number of reads (Why?)
 Calculate alpha and beta diversity measures
 Visualize PCoA projections
 
-In [ ]:
-!qiime diversity core-metrics-phylogenetic \
+In [ ]: !qiime diversity core-metrics-phylogenetic \
     --i-table dada2/table.qza \
     --i-phylogeny tree/rooted_tree.qza \
     --p-sampling-depth 8000 \
@@ -141,8 +131,7 @@ In [ ]:
 Statistical analyses
 Let's first have a look at alpha diversity. Can we see a difference in the per-sample diversity between healthy and sick individuals?
 
-In [ ]:
-!qiime diversity alpha-group-significance \
+In [ ]: !qiime diversity alpha-group-significance \
     --i-alpha-diversity diversity/shannon_vector.qza \
     --m-metadata-file metadata.tsv \
     --o-visualization diversity/alpha_groups.qzv
@@ -151,8 +140,7 @@ Now, let's use beta diversity to see how different the samples are from one anot
 
 We can check whether that separation is 'significant' by using a PERMANOVA test.
 
-In [ ]:
-!qiime diversity adonis \
+In [ ]: !qiime diversity adonis \
     --i-distance-matrix diversity/weighted_unifrac_distance_matrix.qza \
     --m-metadata-file metadata.tsv \
     --p-formula "disease_stat" \
@@ -162,19 +150,16 @@ In [ ]:
 Taxonomy
 We will use a Bayes classifier trained on the GreenGenes database which can be downloaded from https://docs.qiime2.org/2021.4/data-resources/.
 
-In [ ]:
-!wget https://data.qiime2.org/2021.4/common/gg-13-8-99-515-806-nb-classifier.qza
+In [ ]: !wget https://data.qiime2.org/2021.4/common/gg-13-8-99-515-806-nb-classifier.qza
 
-In [ ]:
-!qiime feature-classifier classify-sklearn \
+In [ ]: !qiime feature-classifier classify-sklearn \
     --i-reads dada2/representative_sequences.qza \
     --i-classifier gg-13-8-99-515-806-nb-classifier.qza \
     --o-classification taxa.qza
 
 Now let's have a look at the relative abundances of the different bacterial taxa we have in each sample:
 
-In [ ]:
-!qiime taxa barplot \
+In [ ]: !qiime taxa barplot \
     --i-table dada2/table.qza \
     --i-taxonomy taxa.qza \
     --m-metadata-file metadata.tsv \
@@ -182,8 +167,7 @@ In [ ]:
 
 We can also collapse data on a particular taxonomic rank using the QIIME 2 taxa plugin. Why might we want to look at different taxonomic ranks, rather than just looking at ASVs?
 
-In [ ]:
-!qiime taxa collapse \
+In [ ]: !qiime taxa collapse \
     --i-table dada2/table.qza \
     --i-taxonomy taxa.qza \
     --p-level 6 \
@@ -191,16 +175,14 @@ In [ ]:
 
 We can export the table and convert it to a .csv file so that we can analyze these data using tools outside of the QIIME 2 environment.
 
-In [ ]:
-!qiime tools export \
+In [ ]: !qiime tools export \
     --input-path genus.qza \
     --output-path exported
 !biom convert -i exported/feature-table.biom -o genus.tsv --to-tsv
 
 Now the data are in a common format and we can use them, for instance, to draw a heatmap using Pandas and Seaborn.
 
-In [ ]:
-import numpy as np
+In [ ]: import numpy as np
 import pandas as pd
 import seaborn as sns
 
