@@ -15,7 +15,7 @@ QIIME 2 is usually installed by following the official installation instructions
 
 So...let's start by pulling a local copy of the project repository down from GitHub.
 
-In [ ]: !git clone https://github.com/gibbons-lab/isb_course_2020 materials
+In [ ]:!git clone https://github.com/gibbons-lab/isb_course_2020 materials
 
 Now we are ready to set up our environment. This will take about 10-15 minutes.
 
