@@ -1,4 +1,4 @@
 sample-id forward-absolute-filepath       reverse-absolute-filepath
-C2_S29_L001_R1_001 C2_S29_L001_R1_001.fastq.gz C2_S29_L001_R2_001.fastq.gz
-C5_S32_L001_R1_001 C5_S32_L001_R1_001.fastq.gz C5_S32_L001_R2_001.fastq.gz
+C2_S29_L001_R1_001 $PWD/data/C2_S29_L001_R1_001.fastq.gz $PWD/data/C2_S29_L001_R2_001.fastq.gz
+C5_S32_L001_R1_001 $PWD/data/C5_S32_L001_R1_001.fastq.gz $PWD/data/C5_S32_L001_R2_001.fastq.gz
 
