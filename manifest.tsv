@@ -1,4 +1,4 @@
-sample-id	absolute-filepath
+sample-id  absolute-filepath
 C2_S29_L001_R1_001  $PWD/data/C2_S29_L001_R1_001.fastq.gz
 C2_S29_L001_R2_001  $PWD/data/C2_S29_L001_R2_001.fastq.gz
 C3_S30_L001_R1_001  $PWD/data/C3_S30_L001_R1_001.fastq.gz
